@@ -1,0 +1,93 @@
+import java.util.*;
+
+class Program {
+  public static List<Integer[]> diskStacking(List<Integer[]> disks) {
+    // Write your code here.
+    
+    //TODO[DONE]: Find the disk with max width and height when the height of both are same
+    // Task 1: find the max height possible
+    // Task 2: find the disks that add up to the max height
+    //sort the disk by height
+    disks.sort((disk1, disk2) -> disk1[2].compareTo(disk2[2]));
+    
+    int heights[] = new int[disks.size()];
+
+    for(int idx=0;idx<disks.size();idx++){
+     //since it's sorted by height, check if height array contains duplicate height
+      heights[idx] = disks.get(idx)[2];//get the height
+      
+    }
+
+    // Task 1: find the max height
+    for(int i=0;i<heights.length;i++){
+      int currentWidth = disks.get(i)[0];
+      int currentDepth = disks.get(i)[1];
+      int maxHeight = heights[i];
+      for(int j=0;j<i;j++){
+        int width = disks.get(j)[0];
+        int depth = disks.get(j)[1];
+        int height = disks.get(j)[2];
+        int currentmax = 0;
+        //check if dimensions are valid
+        if( isValidDimension(disks.get(j), disks.get(i)) ){
+          if(currentWidth>width && currentDepth>depth){
+            currentmax = heights[i] + heights[j];
+            if (maxHeight<currentmax){
+              maxHeight = currentmax;
+            }
+        }
+        }
+        
+      }
+      //set heights[i] here---
+      heights[i] = maxHeight;
+      
+    }
+
+    //Task 2: find the indices of the elements of heights array 
+      // that contributed to the max height
+      // Step 1: find the index where max height exists
+      int maxHeight = heights[0];
+      int maxIdx = 0;
+      for(int i=1;i<heights.length;i++){
+        if(heights[i]>maxHeight){
+          maxHeight = heights[i];
+          maxIdx = i;
+        }
+      }
+   
+    // now backtrack
+    int iteratorIdx = maxIdx;
+    ArrayList<Integer[]> result = new ArrayList<Integer[]>();
+    ArrayList<Integer> indices = new ArrayList<Integer>();
+    while(iteratorIdx!=-1){
+      int heightAtIdx = heights[iteratorIdx];
+      int remainingHeight = heightAtIdx - disks.get(iteratorIdx)[2];
+      indices.add(iteratorIdx);
+      //set the iteratorIdx here
+      while(iteratorIdx>-1){
+        if(remainingHeight == heights[iteratorIdx]){
+          break;
+        } else {
+          iteratorIdx--;
+        }
+      }
+      
+    }
+
+    for(int x=indices.size()-1;x>-1;x--){
+      int i = indices.get(x);
+      // check if the same size disk is already added
+      
+      result.add(new Integer[]{disks.get(i)[0], disks.get(i)[1], disks.get(i)[2]});
+      
+    }
+   
+    return result;
+  }
+
+  private static Boolean isValidDimension(Integer[] currentDisk, Integer[] otherDisk){
+    return currentDisk[0] < otherDisk[0] && currentDisk[1] < otherDisk[1] && currentDisk[2] < otherDisk[2];
+  }
+  
+}
